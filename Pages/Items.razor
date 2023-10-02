@@ -1,0 +1,43 @@
+﻿@page "/items"
+@inject ItemRepository itemRepository
+
+<h3>Items</h3>
+<ul>
+    @foreach (var item in items)
+    {
+        <li>
+            <div>@item.Name</div>
+            <p>@item.Description</p>
+            <button @onclick="()=> RemoveItem(item.Id)">Delete</button>
+        </li>
+    }
+</ul>
+
+
+
+<input type=" text" @bind="newItemName" />
+<input type=" text" @bind="newItemDescription" />
+<button @onclick="AddItem">Add Item</button>
+
+@code {
+    private IEnumerable<Item> items;
+    private string newItemName = "";
+    private string newItemDescription = "";
+
+    protected override void OnInitialized()
+    {
+        items = itemRepository.GetAllItems();
+    }
+    private void AddItem()
+    {
+        var newItem = new Item { Name = newItemName, Description=newItemDescription };
+        itemRepository.AddItem(newItem);
+        items = itemRepository.GetAllItems();
+
+    }
+    private void RemoveItem(int Id)
+    {
+        itemRepository.DeleteItem(Id);
+        items = itemRepository.GetAllItems();
+    }
+}
