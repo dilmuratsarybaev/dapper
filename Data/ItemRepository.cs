@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.Sqlite;
-
+using System.Data;
 
 namespace YourApp.Data
 {
@@ -8,10 +8,10 @@ namespace YourApp.Data
 
     {
 
-        private readonly SqliteConnection _dbConnection;
+        private readonly IDbConnection _dbConnection;
 
 
-        public ItemRepository (SqliteConnection dbConnection)
+        public ItemRepository (IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }
@@ -46,6 +46,21 @@ namespace YourApp.Data
         public void AddItem (Item item)
         {
             _dbConnection.Execute("INSERT INTO Items (Name, Description) VALUES (@Name, @Description)", item);
+        }
+
+        public void UpdateItem(Item item)
+        {
+            _dbConnection.Open();
+            _dbConnection.Execute("UPDATE Items SET Name = @Name, Description = @Description WHERE Id = @Id", item);
+            _dbConnection.Close();
+        }
+        public Item GetItemById(int itemId)
+        {
+            _dbConnection.Open();
+            var item = _dbConnection.QueryFirstOrDefault<Item>("SELECT * FROM Items WHERE Id = @Id", new { Id = itemId });
+            _dbConnection.Close();
+
+            return item;
         }
     }
 }

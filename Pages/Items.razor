@@ -9,6 +9,9 @@
             <div>@item.Name</div>
             <p>@item.Description</p>
             <button @onclick="()=> RemoveItem(item.Id)">Delete</button>
+            
+            <button @onclick="()=> EditItem(item)">Edit</button>
+            
         </li>
     }
 </ul>
@@ -17,12 +20,23 @@
 
 <input type=" text" @bind="newItemName" />
 <input type=" text" @bind="newItemDescription" />
-<button @onclick="AddItem">Add Item</button>
+@if (IsEdit)
+{
+
+    <button @onclick=" SaveItem">Save</button>
+}
+else
+{
+    <button @onclick="AddItem">Add Item</button>
+
+}
 
 @code {
     private IEnumerable<Item> items;
+    private bool IsEdit = false;
     private string newItemName = "";
     private string newItemDescription = "";
+    private int EditId;
 
     protected override void OnInitialized()
     {
@@ -33,11 +47,31 @@
         var newItem = new Item { Name = newItemName, Description=newItemDescription };
         itemRepository.AddItem(newItem);
         items = itemRepository.GetAllItems();
+        newItemName = "";
+        newItemDescription = "";
 
     }
     private void RemoveItem(int Id)
     {
         itemRepository.DeleteItem(Id);
         items = itemRepository.GetAllItems();
+    }
+
+    private void EditItem(Item item)
+    {
+        IsEdit = true;
+        newItemName = item.Name;
+        newItemDescription = item.Description;
+        EditId = item.Id;
+    }
+    private void SaveItem()
+    {
+        var editItem = new Item { Name = newItemName, Description = newItemDescription, Id= EditId };
+        itemRepository.UpdateItem(editItem);
+        items = itemRepository.GetAllItems();
+        IsEdit = false;
+        newItemName = "";
+        newItemDescription = "";
+
     }
 }

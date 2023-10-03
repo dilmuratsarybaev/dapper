@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Data.Sqlite;
 using YourApp.Data;
+using System.Data;
 
 namespace YourApp
 {
@@ -24,7 +25,7 @@ namespace YourApp
             services.AddSingleton<WeatherForecastService>();
             services.AddTransient<ItemRepository>();
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
-            services.AddTransient<SqliteConnection>(_ => new SqliteConnection("Data Source=Data\\user.db"));
+            services.AddTransient<IDbConnection>(_ => new SqliteConnection(connectionString));
 
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ItemRepository itemRepository)
